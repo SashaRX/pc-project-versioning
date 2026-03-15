@@ -89,6 +89,7 @@ export function renderPanel(container: HTMLElement): void {
     <div class="pv-root">
       <div class="pv-bar">
         <span class="pv-ver">${escapeHtml(meta.projectVersion)}</span>
+        ${meta.description ? '<span class="pv-sep">\u00b7</span><span class="pv-desc">' + escapeHtml(meta.description) + '</span>' : ''}
         <span class="pv-sep">\u00b7</span>
         <span class="pv-info">${Object.keys(current).length} assets</span>
         <span class="pv-sep">\u00b7</span>

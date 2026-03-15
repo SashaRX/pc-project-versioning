@@ -14,6 +14,7 @@ export function injectStyles(): void {
       font-size: 11px; line-height: 1;
     }
     .pv-ver { color: #8ad19d; font-weight: 600; }
+    .pv-desc { color: #c8cdd0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
     .pv-info { color: #9eabb1; }
     .pv-sep { color: #555; }
     .pv-spacer { flex: 1; }
