@@ -1,6 +1,6 @@
 import { scanAssets, computeDiff } from '../core/assets';
 import { readMeta, writeMeta } from '../core/storage';
-import { escapeHtml, formatSize } from '../core/helpers';
+import { escapeHtml, formatSize, bumpPatch } from '../core/helpers';
 import type { ProjectMeta, DiffResult, AssetEntry, ChangelogEntry } from '../types';
 
 function buildDiffHtml(diff: DiffResult): string {
@@ -73,12 +73,13 @@ function buildHistoryHtml(changelog: ChangelogEntry[]): string {
  */
 export function renderPanel(container: HTMLElement): void {
   const current = scanAssets();
-  const meta: ProjectMeta = readMeta() || { projectVersion: '0.0.0', changelog: [], snapshot: {} };
+  const meta: ProjectMeta = readMeta() || { projectVersion: '0.0.0', description: '', changelog: [], snapshot: {} };
   const diff = computeDiff(meta.snapshot, current);
   const hasChanges = diff.added.length + diff.removed.length + diff.modified.length > 0;
 
   const diffHtml = buildDiffHtml(diff);
   const historyHtml = buildHistoryHtml(meta.changelog || []);
+  const nextVersion = bumpPatch(meta.projectVersion);
 
   const cs = hasChanges
     ? `<span class="pv-c-add">+${diff.added.length}</span> <span class="pv-c-mod">~${diff.modified.length}</span> <span class="pv-c-rem">-${diff.removed.length}</span>`
@@ -98,10 +99,13 @@ export function renderPanel(container: HTMLElement): void {
       </div>
 
       <div class="pv-view" data-pv-view="snapshot">
+        <div class="pv-desc-row">
+          <input type="text" class="pv-input pv-input-wide" data-pv-field="description" value="${escapeHtml(meta.description)}" placeholder="Project description...">
+        </div>
         ${hasChanges ? '<div class="pv-diff">' + diffHtml + '</div>' : '<div class="pv-diff"><div class="pv-empty">No changes</div></div>'}
         <div class="pv-footer">
-          <input type="text" class="pv-input" data-pv-field="version" value="${escapeHtml(meta.projectVersion)}" placeholder="0.0.0">
-          <input type="text" class="pv-input pv-input-wide" data-pv-field="notes" placeholder="Notes...">
+          <input type="text" class="pv-input" data-pv-field="version" value="${escapeHtml(nextVersion)}" placeholder="0.0.0">
+          <input type="text" class="pv-input pv-input-wide" data-pv-field="notes" placeholder="What changed...">
           <button class="pv-btn pv-btn-primary" data-pv-action="save" type="button">Save</button>
         </div>
       </div>
@@ -141,8 +145,10 @@ export function renderPanel(container: HTMLElement): void {
     saveBtn.onclick = () => {
       const versionInput = container.querySelector<HTMLInputElement>('[data-pv-field="version"]');
       const notesInput = container.querySelector<HTMLInputElement>('[data-pv-field="notes"]');
-      const version = versionInput?.value.trim() || meta.projectVersion || '0.0.0';
+      const descInput = container.querySelector<HTMLInputElement>('[data-pv-field="description"]');
+      const version = versionInput?.value.trim() || nextVersion;
       const notes = notesInput?.value.trim() || '';
+      const description = descInput?.value.trim() || meta.description || '';
 
       const entry = {
         version,
@@ -155,11 +161,24 @@ export function renderPanel(container: HTMLElement): void {
 
       const ok = writeMeta({
         projectVersion: version,
+        description,
         changelog: [entry, ...(meta.changelog || [])].slice(0, 50),
         snapshot: current,
       });
 
       if (ok) renderPanel(container);
+    };
+  }
+
+  // Auto-save description on blur (without creating a snapshot)
+  const descInput = container.querySelector<HTMLInputElement>('[data-pv-field="description"]');
+  if (descInput) {
+    descInput.onblur = () => {
+      const val = descInput.value.trim();
+      if (val !== meta.description) {
+        meta.description = val;
+        writeMeta(meta);
+      }
     };
   }
 }

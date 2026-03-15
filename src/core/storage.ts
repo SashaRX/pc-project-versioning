@@ -7,7 +7,7 @@ function storageKey(): string {
 
 function normalizeMeta(data: unknown): ProjectMeta {
   if (!data || typeof data !== 'object' || Array.isArray(data)) {
-    return { projectVersion: '0.0.0', changelog: [], snapshot: {} };
+    return { projectVersion: '0.0.0', description: '', changelog: [], snapshot: {} };
   }
 
   const d = data as Record<string, unknown>;
@@ -16,6 +16,7 @@ function normalizeMeta(data: unknown): ProjectMeta {
       typeof d.projectVersion === 'string' && (d.projectVersion as string).trim()
         ? (d.projectVersion as string)
         : '0.0.0',
+    description: typeof d.description === 'string' ? (d.description as string) : '',
     changelog: Array.isArray(d.changelog) ? d.changelog : [],
     snapshot:
       d.snapshot && typeof d.snapshot === 'object' && !Array.isArray(d.snapshot)
@@ -39,6 +40,7 @@ export function writeMeta(obj: ProjectMeta): boolean {
   try {
     const payload: ProjectMeta = {
       projectVersion: obj.projectVersion || '0.0.0',
+      description: obj.description || '',
       changelog: Array.isArray(obj.changelog) ? obj.changelog : [],
       snapshot: obj.snapshot && typeof obj.snapshot === 'object' ? obj.snapshot : {},
     };

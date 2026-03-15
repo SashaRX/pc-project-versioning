@@ -52,6 +52,10 @@ export function injectStyles(): void {
     .pv-rem { color: #d48c8c; }
     .pv-empty { padding: 10px; font-size: 11px; color: #9eabb1; }
 
+    .pv-desc-row {
+      display: flex; padding: 8px 10px 0;
+    }
+
     .pv-footer {
       display: flex; gap: 6px; padding: 8px 10px;
     }

@@ -25,3 +25,10 @@ export function escapeHtml(str: unknown): string {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
+
+/** 0.0.1 → 0.0.2, 1.2.3 → 1.2.4, garbage → 0.0.1 */
+export function bumpPatch(version: string): string {
+  const m = (version || '').match(/^(\d+)\.(\d+)\.(\d+)/);
+  if (!m) return '0.0.1';
+  return m[1] + '.' + m[2] + '.' + (Number(m[3]) + 1);
+}

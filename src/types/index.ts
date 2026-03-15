@@ -19,6 +19,7 @@ export interface ChangelogEntry {
 
 export interface ProjectMeta {
   projectVersion: string;
+  description: string;
   changelog: ChangelogEntry[];
   snapshot: AssetMap;
 }
