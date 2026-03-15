@@ -2,33 +2,38 @@ import { normalizeSpaces, isVisible } from '../core/helpers';
 import { BTN_CLASS, ROOT_CLASS } from './constants';
 import { openPanel } from './panel';
 
-function getRootTitle(root: HTMLElement): string {
-  const sels = [
-    '.pcui-dialog-header', '.pcui-panel-header', '.dialog-header',
-    '.header', '[class*="header"]', '.title', '[class*="title"]',
-  ];
-  for (const sel of sels) {
-    for (const node of root.querySelectorAll(sel)) {
-      const t = normalizeSpaces(node.textContent || '');
-      if (t === 'BUILDS') return t;
-    }
-  }
-  return '';
-}
+const HEADER_SELS = 'h1,h2,h3,h4,.title,[class*="title"],[class*="header"],header,span,div';
+const MARKERS = ['PUBLISH TO PLAYCANVAS', 'DOWNLOAD .ZIP', 'EXISTING BUILDS'];
 
 function findBuildWindows(): HTMLElement[] {
-  const roots = Array.from(document.querySelectorAll<HTMLElement>([
-    '.pcui-dialog', '.pcui-panel', '.ui-dialog', '.dialog',
-    '[role="dialog"]', '[class*="dialog"]', '[class*="panel"]', '[class*="window"]',
-  ].join(',')));
+  const results: HTMLElement[] = [];
+  const seen = new WeakSet<HTMLElement>();
 
-  return roots.filter((root) => {
-    if (!root.isConnected || !isVisible(root)) return false;
-    const text = normalizeSpaces(root.innerText || root.textContent || '').toUpperCase();
-    return text.includes('BUILDS') && text.includes('PUBLISH TO PLAYCANVAS')
-      && text.includes('DOWNLOAD .ZIP') && text.includes('EXISTING BUILDS')
-      && getRootTitle(root).toUpperCase() === 'BUILDS';
-  });
+  // Ищем заголовок "BUILDS" среди типичных заголовочных элементов
+  for (const el of document.querySelectorAll<HTMLElement>(HEADER_SELS)) {
+    if (!el.isConnected) continue;
+    // Только прямой текст (без вложенных), чтобы не матчить весь контейнер
+    const ownText = normalizeSpaces(
+      Array.from(el.childNodes)
+        .filter(n => n.nodeType === 3)
+        .map(n => n.textContent || '')
+        .join('')
+    );
+    if (ownText !== 'BUILDS') continue;
+    if (!isVisible(el)) continue;
+
+    // Поднимаемся к контейнеру с маркерами
+    let parent: HTMLElement | null = el.parentElement;
+    for (let i = 0; i < 15 && parent; i++) {
+      const text = (parent.innerText || '').toUpperCase();
+      if (MARKERS.every(m => text.includes(m))) {
+        if (!seen.has(parent)) { seen.add(parent); results.push(parent); }
+        break;
+      }
+      parent = parent.parentElement;
+    }
+  }
+  return results;
 }
 
 export function injectBuildButtons(): void {
@@ -55,6 +60,9 @@ export function injectBuildButtons(): void {
 }
 
 export function observeUi(): void {
-  new MutationObserver(() => injectBuildButtons())
-    .observe(document.body, { childList: true, subtree: true });
+  let timer: ReturnType<typeof setTimeout> | null = null;
+  new MutationObserver(() => {
+    if (timer) return;
+    timer = setTimeout(() => { timer = null; injectBuildButtons(); }, 300);
+  }).observe(document.body, { childList: true, subtree: true });
 }
