@@ -30,28 +30,38 @@ function buildHistoryHtml(changelog: ChangelogEntry[]): string {
   if (!changelog.length) return '<div class="pv-empty">No history yet</div>';
 
   let html = '';
-  for (const entry of changelog) {
+  for (let i = 0; i < changelog.length; i++) {
+    const entry = changelog[i];
     const total = (entry.added?.length || 0) + (entry.modified?.length || 0) + (entry.removed?.length || 0);
+    const uid = 'pv-h-' + i;
+
     html += '<div class="pv-hist-entry">';
-    html += '<div class="pv-hist-head">';
+
+    // Header row — clickable to expand files
+    html += `<div class="pv-hist-head" data-pv-toggle="${uid}">`;
     html += `<span class="pv-hist-ver">${escapeHtml(entry.version)}</span>`;
     html += `<span class="pv-hist-date">${escapeHtml(entry.date)}</span>`;
+    if (entry.notes) html += `<span class="pv-hist-notes">${escapeHtml(entry.notes)}</span>`;
+    html += '<span class="pv-spacer"></span>';
     if (total > 0) {
       html += '<span class="pv-hist-counts">';
       if (entry.added?.length) html += `<span class="pv-c-add">+${entry.added.length}</span> `;
       if (entry.modified?.length) html += `<span class="pv-c-mod">~${entry.modified.length}</span> `;
       if (entry.removed?.length) html += `<span class="pv-c-rem">-${entry.removed.length}</span>`;
       html += '</span>';
+      html += `<span class="pv-hist-arrow" id="${uid}-arrow">\u25b6</span>`;
     }
     html += '</div>';
-    if (entry.notes) html += `<div class="pv-hist-notes">${escapeHtml(entry.notes)}</div>`;
+
+    // Collapsible file list
     if (total > 0) {
-      html += '<div class="pv-hist-files">';
-      for (const n of entry.added || []) html += `<span class="pv-c-add">+ ${escapeHtml(n)}</span>`;
-      for (const n of entry.modified || []) html += `<span class="pv-c-mod">~ ${escapeHtml(n)}</span>`;
-      for (const n of entry.removed || []) html += `<span class="pv-c-rem">- ${escapeHtml(n)}</span>`;
+      html += `<div class="pv-hist-files pv-collapsed" id="${uid}">`;
+      for (const n of entry.added || []) html += `<div class="pv-c-add">+ ${escapeHtml(n)}</div>`;
+      for (const n of entry.modified || []) html += `<div class="pv-c-mod">~ ${escapeHtml(n)}</div>`;
+      for (const n of entry.removed || []) html += `<div class="pv-c-rem">- ${escapeHtml(n)}</div>`;
       html += '</div>';
     }
+
     html += '</div>';
   }
   return html;
@@ -110,6 +120,18 @@ export function renderPanel(container: HTMLElement): void {
         b.classList.toggle('pv-tab-active', b.dataset.pvTab === tab));
       container.querySelectorAll<HTMLElement>('[data-pv-view]').forEach(v =>
         v.style.display = v.dataset.pvView === tab ? '' : 'none');
+    };
+  });
+
+  // History entry toggle (expand/collapse file list)
+  container.querySelectorAll<HTMLElement>('[data-pv-toggle]').forEach(head => {
+    head.onclick = () => {
+      const id = head.dataset.pvToggle!;
+      const files = container.querySelector<HTMLElement>('#' + id);
+      const arrow = container.querySelector<HTMLElement>('#' + id + '-arrow');
+      if (!files) return;
+      const collapsed = files.classList.toggle('pv-collapsed');
+      if (arrow) arrow.textContent = collapsed ? '\u25b6' : '\u25bc';
     };
   });
 

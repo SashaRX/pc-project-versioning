@@ -79,21 +79,23 @@ export function injectStyles(): void {
 
     .pv-hist-head {
       display: flex; align-items: center; gap: 8px; font-size: 11px; line-height: 1;
+      cursor: pointer; user-select: none;
     }
+    .pv-hist-head:hover { background: rgba(255,255,255,0.03); margin: -2px -4px; padding: 2px 4px; border-radius: 2px; }
     .pv-hist-ver { color: #8ad19d; font-weight: 600; }
     .pv-hist-date { color: #9eabb1; }
-    .pv-hist-counts { margin-left: auto; display: flex; gap: 4px; font-size: 10px; }
-
-    .pv-hist-notes {
-      margin-top: 3px; font-size: 11px; color: #c8cdd0; line-height: 1.35;
-    }
+    .pv-hist-notes { color: #c8cdd0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 260px; }
+    .pv-hist-counts { display: flex; gap: 4px; font-size: 10px; }
+    .pv-hist-arrow { color: #666; font-size: 8px; width: 12px; text-align: center; }
 
     .pv-hist-files {
-      margin-top: 3px; display: flex; flex-wrap: wrap; gap: 2px 8px;
-      font-size: 10px; line-height: 1.4;
+      margin-top: 4px; padding: 4px 0 0 20px;
+      font-size: 10px; line-height: 1.6;
+      border-left: 1px solid #3a4a52;
     }
-    .pv-hist-files span {
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 240px;
+    .pv-hist-files.pv-collapsed { display: none; }
+    .pv-hist-files div {
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
   `;
   document.head.appendChild(s);
