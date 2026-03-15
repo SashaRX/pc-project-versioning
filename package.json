@@ -1,6 +1,6 @@
 {
   "name": "pc-project-versioning",
-  "version": "1.5.6",
+  "version": "1.5.7",
   "private": true,
   "scripts": {
     "build": "vite build",
