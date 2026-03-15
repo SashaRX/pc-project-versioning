@@ -1,4 +1,4 @@
-import { OVERLAY_ID } from './inject';
+import { OVERLAY_ID } from './constants';
 import { scanAssets, computeDiff } from '../core/assets';
 import { readMeta, writeMeta } from '../core/storage';
 import { escapeHtml, formatSize } from '../core/helpers';

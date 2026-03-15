@@ -1,10 +1,6 @@
 import { normalizeSpaces, isVisible } from '../core/helpers';
+import { BTN_CLASS, ROOT_CLASS } from './constants';
 import { openPanel } from './panel';
-
-export const OVERLAY_ID = 'pv-overlay';
-export const STYLE_ID = 'pv-style';
-export const BTN_CLASS = 'pv-build-btn';
-export const ROOT_CLASS = 'pv-build-root';
 
 function getRootTitle(root: HTMLElement): string {
   const sels = [

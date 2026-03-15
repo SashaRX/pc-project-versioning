@@ -1,4 +1,4 @@
-import { BTN_CLASS, ROOT_CLASS, STYLE_ID } from './inject';
+import { BTN_CLASS, ROOT_CLASS, STYLE_ID } from './constants';
 
 export function injectStyles(): void {
   if (document.getElementById(STYLE_ID)) return;
