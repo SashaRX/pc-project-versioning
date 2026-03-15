@@ -1,16 +1,14 @@
-export function normalizeSpaces(text: string): string {
-  let out = '';
-  let sp = true;
-  for (let i = 0; i < text.length; i++) {
-    if (text.charCodeAt(i) <= 32) {
-      if (!sp) out += ' ';
-      sp = true;
-    } else {
-      out += text[i];
-      sp = false;
-    }
-  }
-  return out.trim();
+/**
+ * window.config.project.id — доступен напрямую,
+ * см. playcanvas/editor src/editor/config.ts
+ */
+export function getProjectId(): string {
+  try {
+    const id = window.config?.project?.id;
+    if (id) return String(id);
+  } catch (_e) { /* fallback */ }
+  const m = window.location.pathname.match(/\/(\d{4,})/);
+  return m ? m[1] : 'unknown';
 }
 
 export function formatSize(b: number): string {
@@ -26,24 +24,4 @@ export function escapeHtml(str: unknown): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
-}
-
-export function isVisible(el: HTMLElement): boolean {
-  const s = window.getComputedStyle(el);
-  if (s.display === 'none' || s.visibility === 'hidden' || s.opacity === '0') return false;
-  const r = el.getBoundingClientRect();
-  return r.width > 0 && r.height > 0;
-}
-
-export function getProjectId(): string {
-  try {
-    const id = window.editor.call('project:settings') as { get(key: string): unknown } | null;
-    if (id) {
-      const val = id.get('id');
-      if (val) return String(val);
-    }
-  } catch (_e) { /* fallback */ }
-
-  const m = window.location.pathname.match(/\/(\d{4,})/);
-  return m ? m[1] : 'unknown';
 }

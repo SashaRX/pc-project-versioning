@@ -29,10 +29,52 @@ export interface DiffResult {
   modified: { prev: AssetEntry; curr: AssetEntry }[];
 }
 
+/* PlayCanvas Editor globals */
+
+interface PcuiElement {
+  dom: HTMLElement;
+  element: HTMLElement;
+  hidden: boolean;
+  class: { add(cls: string): void; remove(cls: string): void; contains(cls: string): boolean };
+  append(child: PcuiElement): void;
+  on(event: string, fn: (...args: unknown[]) => void): { unbind(): void };
+  destroy(): void;
+}
+
+interface PcuiContainer extends PcuiElement {
+  clear(): void;
+}
+
+interface PcuiLib {
+  Container: new (opts?: Record<string, unknown>) => PcuiContainer;
+  Label: new (opts?: Record<string, unknown>) => PcuiElement;
+  Button: new (opts?: Record<string, unknown>) => PcuiElement;
+  TextInput: new (opts?: Record<string, unknown>) => PcuiElement & { value: string };
+}
+
+interface EditorApi {
+  call(method: string, ...args: unknown[]): unknown;
+  on(event: string, fn: (...args: unknown[]) => void): { unbind(): void };
+  once(event: string, fn: (...args: unknown[]) => void): void;
+  method(name: string, fn: (...args: unknown[]) => unknown): void;
+  emit(event: string, ...args: unknown[]): void;
+}
+
 declare global {
   interface Window {
-    editor: {
-      call(method: string, ...args: unknown[]): unknown;
+    editor: EditorApi;
+    pcui: PcuiLib;
+    config: {
+      project: {
+        id: number;
+        name: string;
+        settings: {
+          loadingScreenScript: string | null;
+          [key: string]: unknown;
+        };
+        [key: string]: unknown;
+      };
+      [key: string]: unknown;
     };
   }
 }
