@@ -9,7 +9,7 @@ export function injectStyles(): void {
     /* ── Menu icon for VERSIONING tab in project picker ── */
     .ui-list-item.versioning::before {
       font-family: 'pc-icon' !important;
-      content: '\\E22D' !important;
+      content: '\\E113' !important;
     }
 
     .pv-root { font-family: Arial, sans-serif; color: #d7dde0; }
