@@ -6,6 +6,12 @@ export function injectStyles(): void {
   const s = document.createElement('style');
   s.id = STYLE_ID;
   s.textContent = `
+    /* ── Menu icon for VERSIONING tab in project picker ── */
+    .ui-list-item.versioning::before {
+      font-family: 'pc-icon' !important;
+      content: '\\E22D' !important;
+    }
+
     .pv-root { font-family: Arial, sans-serif; color: #d7dde0; }
 
     .pv-bar {
