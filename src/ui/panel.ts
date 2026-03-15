@@ -99,41 +99,26 @@ export function renderPanel(container: HTMLElement): void {
         <span class="pv-info">${Object.keys(current).length} assets</span>
         <span class="pv-sep">\u00b7</span>
         ${cs}
-        <span class="pv-spacer"></span>
-        <button class="pv-tab pv-tab-active" data-pv-tab="snapshot" type="button">Snapshot</button>
-        <button class="pv-tab" data-pv-tab="history" type="button">History</button>
       </div>
 
-      <div class="pv-view" data-pv-view="snapshot">
-        <div class="pv-desc-row">
-          <input type="text" class="pv-input pv-input-wide" data-pv-field="description" value="${escapeHtml(meta.description)}" placeholder="Project description...">
-        </div>
-        ${hasChanges ? '<div class="pv-diff">' + diffHtml + '</div>' : '<div class="pv-diff"><div class="pv-empty">No changes</div></div>'}
-        <div class="pv-footer">
-          <input type="text" class="pv-input" data-pv-field="version" value="${escapeHtml(nextVersion)}" placeholder="0.0.0">
-          <input type="text" class="pv-input pv-input-wide" data-pv-field="notes" placeholder="What changed...">
-          <button class="pv-btn pv-btn-primary" data-pv-action="save" type="button">Save</button>
-        </div>
+      <div class="pv-desc-row">
+        <input type="text" class="pv-input pv-input-wide" data-pv-field="description" value="${escapeHtml(meta.description)}" placeholder="Project description...">
       </div>
 
-      <div class="pv-view" data-pv-view="history" style="display:none">
-        <div class="pv-history">${historyHtml}</div>
+      ${hasChanges ? '<div class="pv-diff">' + diffHtml + '</div>' : ''}
+
+      <div class="pv-footer">
+        <input type="text" class="pv-input" data-pv-field="version" value="${escapeHtml(nextVersion)}" placeholder="0.0.0">
+        <input type="text" class="pv-input pv-input-wide" data-pv-field="notes" placeholder="What changed...">
+        <button class="pv-btn pv-btn-primary" data-pv-action="save" type="button">Save</button>
       </div>
+
+      <div class="pv-section-label">History</div>
+      <div class="pv-history">${historyHtml}</div>
     </div>
   `;
 
-  // Tab switching
-  container.querySelectorAll<HTMLElement>('[data-pv-tab]').forEach(btn => {
-    btn.onclick = () => {
-      const tab = btn.dataset.pvTab!;
-      container.querySelectorAll<HTMLElement>('[data-pv-tab]').forEach(b =>
-        b.classList.toggle('pv-tab-active', b.dataset.pvTab === tab));
-      container.querySelectorAll<HTMLElement>('[data-pv-view]').forEach(v =>
-        v.style.display = v.dataset.pvView === tab ? '' : 'none');
-    };
-  });
-
-  // History entry toggle (expand/collapse file list)
+  // History entry toggle
   container.querySelectorAll<HTMLElement>('[data-pv-toggle]').forEach(head => {
     head.onclick = () => {
       const id = head.dataset.pvToggle!;
@@ -177,7 +162,7 @@ export function renderPanel(container: HTMLElement): void {
     };
   }
 
-  // Auto-save description on blur (without creating a snapshot)
+  // Auto-save description on blur
   const descInput = container.querySelector<HTMLInputElement>('[data-pv-field="description"]');
   if (descInput) {
     descInput.onblur = () => {

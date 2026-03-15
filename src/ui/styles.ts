@@ -30,14 +30,10 @@ export function injectStyles(): void {
     .pv-c-rem { color: #d48c8c; }
     .pv-c-none { color: #9eabb1; }
 
-    .pv-tab {
-      appearance: none; border: 1px solid transparent; background: transparent;
-      color: #9eabb1; padding: 3px 8px; border-radius: 2px;
-      font: 600 10px Arial, sans-serif; text-transform: uppercase;
-      letter-spacing: 0.04em; cursor: pointer;
+    .pv-section-label {
+      padding: 6px 10px; font-size: 9px; letter-spacing: 1.5px;
+      text-transform: uppercase; color: #666; border-top: 1px solid #425159;
     }
-    .pv-tab:hover { color: #d7dde0; background: #33444c; }
-    .pv-tab-active { color: #f0f4f6; background: #3a4d56; border-color: #4e6069; }
 
     .pv-diff {
       max-height: 260px; overflow: auto;
