@@ -94,6 +94,43 @@ export function injectStyles(): void {
     }
     .pv-btn-primary { border: 1px solid #ff8a2b; background: #ff7f1f; color: #1e2528; }
     .pv-btn-primary:hover { background: #ff933f; border-color: #ff9f57; }
+
+    .pv-tab {
+      appearance: none; border: 1px solid transparent; background: transparent;
+      color: #9eabb1; padding: 3px 8px; border-radius: 2px;
+      font: 600 10px Arial, sans-serif; text-transform: uppercase;
+      letter-spacing: 0.04em; cursor: pointer;
+    }
+    .pv-tab:hover { color: #d7dde0; background: #33444c; }
+    .pv-tab-active { color: #f0f4f6; background: #3a4d56; border-color: #4e6069; }
+
+    .pv-history {
+      max-height: 320px; overflow: auto; background: #26343a;
+    }
+
+    .pv-hist-entry {
+      padding: 6px 10px;
+    }
+    .pv-hist-entry + .pv-hist-entry { border-top: 1px solid #2f3e45; }
+
+    .pv-hist-head {
+      display: flex; align-items: center; gap: 8px; font-size: 11px; line-height: 1;
+    }
+    .pv-hist-ver { color: #8ad19d; font-weight: 600; }
+    .pv-hist-date { color: #9eabb1; }
+    .pv-hist-counts { margin-left: auto; display: flex; gap: 4px; font-size: 10px; }
+
+    .pv-hist-notes {
+      margin-top: 3px; font-size: 11px; color: #c8cdd0; line-height: 1.35;
+    }
+
+    .pv-hist-files {
+      margin-top: 3px; display: flex; flex-wrap: wrap; gap: 2px 8px;
+      font-size: 10px; line-height: 1.4;
+    }
+    .pv-hist-files span {
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 240px;
+    }
   `;
   document.head.appendChild(s);
 }
