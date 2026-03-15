@@ -56,9 +56,10 @@ export function writeMeta(obj: ProjectMeta): boolean {
 }
 
 /**
- * Синхронизирует projectVersion и description в ассет _project_meta.json.
- * Loading screen (loadingScreen.js) читает этот файл через XHR при запуске билда.
- * Пишем только 2 поля — маленький объект не ломает OT.
+ * Синхронизирует projectVersion и description в ассет _project_meta.json
+ * через REST API (PUT /api/assets/{id}?branchId=...).
+ * OT ломается на set('data', obj), поэтому пишем файл напрямую.
+ * Loading screen (loadingScreen.js) читает этот файл через XHR при запуске.
  */
 function syncMetaAsset(version: string, description: string): void {
   try {
@@ -71,8 +72,24 @@ function syncMetaAsset(version: string, description: string): void {
       console.warn('[ProjectVersion] _project_meta.json not found, skipping sync');
       return;
     }
-    asset.set('data', { projectVersion: version, description: description });
-    console.log('[ProjectVersion] _project_meta.json synced:', version);
+
+    const assetId = asset.get('id') as number;
+    const branchId = (window.config as Record<string, unknown> & { self?: { branch?: { id?: string } } })
+      ?.self?.branch?.id || '';
+
+    const json = JSON.stringify({ projectVersion: version, description }, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const form = new FormData();
+    form.append('file', blob, '_project_meta.json');
+
+    const url = '/api/assets/' + assetId + (branchId ? '?branchId=' + branchId : '');
+
+    fetch(url, { method: 'PUT', body: form })
+      .then(r => {
+        if (r.ok) console.log('[ProjectVersion] _project_meta.json synced:', version);
+        else console.warn('[ProjectVersion] _project_meta.json sync failed:', r.status);
+      })
+      .catch(e => console.warn('[ProjectVersion] _project_meta.json sync error:', e));
   } catch (e) {
     console.warn('[ProjectVersion] Failed to sync _project_meta.json:', e);
   }
