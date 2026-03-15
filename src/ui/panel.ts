@@ -41,7 +41,7 @@ function buildHistoryHtml(changelog: ChangelogEntry[]): string {
     html += `<div class="pv-hist-head" data-pv-toggle="${uid}">`;
     html += `<span class="pv-hist-ver">${escapeHtml(entry.version)}</span>`;
     html += `<span class="pv-hist-date">${escapeHtml(entry.date)}</span>`;
-    if (entry.notes) html += `<span class="pv-hist-notes">${escapeHtml(entry.notes)}</span>`;
+    if (entry.notes) html += `<span class="pv-hist-note">${escapeHtml(entry.notes)}</span>`;
     html += '<span class="pv-spacer"></span>';
     if (total > 0) {
       html += '<span class="pv-hist-counts">';
@@ -52,6 +52,11 @@ function buildHistoryHtml(changelog: ChangelogEntry[]): string {
       html += `<span class="pv-hist-arrow" id="${uid}-arrow">\u25b6</span>`;
     }
     html += '</div>';
+
+    // Description (if present)
+    if (entry.description) {
+      html += `<div class="pv-hist-desc">${escapeHtml(entry.description)}</div>`;
+    }
 
     // Collapsible file list
     if (total > 0) {
@@ -154,6 +159,7 @@ export function renderPanel(container: HTMLElement): void {
       const entry = {
         version,
         date: new Date().toISOString().slice(0, 10),
+        description,
         notes,
         added: diff.added.map((a: AssetEntry) => a.name),
         modified: diff.modified.map((m) => m.curr.name),

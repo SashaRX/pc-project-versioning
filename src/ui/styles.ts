@@ -89,9 +89,14 @@ export function injectStyles(): void {
     .pv-hist-head:hover { background: rgba(255,255,255,0.03); margin: -2px -4px; padding: 2px 4px; border-radius: 2px; }
     .pv-hist-ver { color: #8ad19d; font-weight: 600; }
     .pv-hist-date { color: #9eabb1; }
-    .pv-hist-notes { color: #c8cdd0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 260px; }
+    .pv-hist-note { color: #c8cdd0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 260px; }
     .pv-hist-counts { display: flex; gap: 4px; font-size: 10px; }
     .pv-hist-arrow { color: #666; font-size: 8px; width: 12px; text-align: center; }
+
+    .pv-hist-desc {
+      margin-top: 3px; padding-left: 2px;
+      font-size: 10px; color: #8a9aa1; font-style: italic;
+    }
 
     .pv-hist-files {
       margin-top: 4px; padding: 4px 0 0 20px;

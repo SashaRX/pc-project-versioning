@@ -11,6 +11,7 @@ export interface AssetMap {
 export interface ChangelogEntry {
   version: string;
   date: string;
+  description: string;
   notes: string;
   added: string[];
   modified: string[];
