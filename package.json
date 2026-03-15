@@ -1,0 +1,13 @@
+{
+  "name": "pc-project-versioning",
+  "version": "1.5.0",
+  "private": true,
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "typescript": "^5.3.0"
+  }
+}

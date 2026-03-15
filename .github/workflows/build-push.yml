@@ -1,0 +1,69 @@
+name: Build & Push to Gist
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GIST_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Bump patch version
+        run: |
+          CURRENT=$(node -p "require('./package.json').version")
+          NEW=$(node -p "const v='$CURRENT'.split('.'); v[2]=+v[2]+1; v.join('.')")
+          node -e "
+            const fs = require('fs');
+            const pkg = JSON.parse(fs.readFileSync('package.json','utf-8'));
+            pkg.version = '$NEW';
+            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+          "
+          echo "VERSION=$NEW" >> $GITHUB_ENV
+          echo "Bumped: $CURRENT → $NEW"
+
+      - name: Commit version bump
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json
+          git diff --staged --quiet || git commit -m "ci: bump v${{ env.VERSION }} [skip ci]"
+          git push
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Push to Gist
+        env:
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+          GIST_ID: 0001d8aa0d715d3f5eca171df9021a21
+        run: |
+          CONTENT=$(cat dist/pc-project-versioning.user.js | python3 -c "
+          import sys, json
+          content = sys.stdin.read()
+          payload = {
+            'files': {
+              'pc-project-versioning.user.js': {
+                'content': content
+              }
+            }
+          }
+          print(json.dumps(payload))
+          ")
+
+          curl -s -X PATCH "https://api.github.com/gists/${GIST_ID}" \
+            -H "Authorization: token ${GIST_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d "$CONTENT" \
+            | python3 -c "import sys,json; d=json.load(sys.stdin); print('Updated:', d.get('updated_at','ERROR'))"
